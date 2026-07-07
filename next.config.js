@@ -1,40 +1,65 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
-  // Optimizations
   reactStrictMode: true,
+
   swcMinify: true,
-  
-  // Compression
-  compress: true,
-  
-  // Image optimization
+
+  productionBrowserSourceMaps: false,
+
   images: {
-    unoptimized: false,
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
   },
-  
-  // Headers for security
+
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
+
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: "/:path*",
         headers: [
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value:
+              "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Content-Security-Policy",
+            value:
+              "default-src 'self'; img-src 'self' data: https:; media-src 'self'; font-src 'self' https: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https:;",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value:
+              "max-age=63072000; includeSubDomains; preload",
           },
         ],
       },
     ];
   },
+};
+
+export default nextConfig;export default nextConfig;  },
   
   // Environment variables
   env: {
